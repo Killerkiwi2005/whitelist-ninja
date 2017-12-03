@@ -1,0 +1,32 @@
+{
+  "manifest_version": 2,
+  "name": "Whitelist Ninja",
+  "version": "2.0",
+
+  "description": "Whitelist sites that can be accessed, admin is by password",
+
+  "icons": {
+    "48": "icons/icon.png"
+  },
+  "browser_action": {
+        "browser_style": true,
+        "default_icon": {
+            "16": "icons/icon.png",
+            "32": "icons/icon.png"
+        },
+        "default_popup": "data/panel-ui.html"
+    },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "tabs",
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>"   
+   ],
+   
+   "background": {
+    "scripts": ["lib/browser-polyfill.js", "lib/storage.js", "lib/util.js", "lib/chrome.js", "lib/whitelist.js", "lib/security.js", "worker.js", "lib/events.js"],
+    "persistent": true // CHROME ONLY
+  }   
+}

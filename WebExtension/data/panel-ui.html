@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">   
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <style type="text/css" media="all">
+
+        body {
+            background-color: white;
+            background-image: none;
+            font-family: verdana;
+            margin: 5px 5px 5px 5px;
+            text-align: center;
+        }
+        #img-ninja {
+            background-size: 65px 65px;
+            background-repeat: no-repeat;
+            background-position: center top;
+            height: 70px
+        }
+
+        #img-ninja.active {
+            background-image: URL(active.png);
+        }
+        #img-ninja.inactive {
+            background-image: URL(inactive.png);
+        }
+        #img-ninja.blocked {
+            background-image: URL(block.png);
+        }
+
+        #input-url {
+            width: 80%;
+        }
+
+        #div-status {
+            color: white;
+            text-align: center;
+            padding: 5px 2px 5px 2px;
+            border-radius: 3px;
+        }
+        #div-status.blocked {
+            background-color: #A60E0E;
+
+        }
+        #div-status.allowed {
+            background-color: #11A50E;
+        }
+
+    </style>
+
+</head>
+<body>
+
+	<p id="p-description"><b><span id="span-domain"></span></b></p>
+
+	<div id="img-ninja" class='active'></div>
+	<div class='blocked' id="div-status">BLOCKED</div>
+
+	<p><a href="#" id="button-toggle-site" class="button">Unblock site</a> <a href="#" id="button-toggle" class="button button-alt">Disable Blocking</a></p>
+
+	<p><a href="#" id="a-all-sites">settings</a></p>
+	<script src="panel-ui.js"></script>
+</body>
+</html>
+

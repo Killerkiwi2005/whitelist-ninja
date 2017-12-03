@@ -1,0 +1,83 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="style.css" />
+    <style type="text/css" media="all">
+        body {
+            background-color: white;
+            text-align: center;
+            font-family: verdana;
+        }
+        #input-urls {
+            width: 100%;
+
+            height: 300px;
+            padding: 10px 10px 10px 10px;
+            font-family: arial;
+            border: 1px solid gray;
+        }
+        .padding {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        a {
+            color: black;
+        }
+
+        input.stretch {
+            width: 100%;
+            max-width: 600px;
+        }
+    </style>
+  </head>
+<body>
+    <div class="padding">
+        <h2>Whitelist Ninja Settings</h2>
+
+        <p>All donations go towards development time, thanks for your support!</p>
+
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+            <input type="hidden" name="cmd" value="_s-xclick">
+            <input type="hidden" name="hosted_button_id" value="H5VZRZDXH8W3C">
+            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+            <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+        </form>
+
+
+        <fieldset>
+            <legend align="top">Whitelist</legend>
+            <p>use * as end wildcard:</p>
+            <div class="padding"><textarea id="input-urls"></textarea>
+            </div>
+            <p>Recently Blocked :
+                <div id="span-blocked"></div>
+            </p>
+        </fieldset>
+
+        <fieldset>
+            <legend>Password</legend>
+            <p><button class="button button-alt" id="button-password">Change Password</button>
+            </p>
+        </fieldset>
+
+        <fieldset>
+            <legend>External Whitelist</legend>
+            <p>Select a file or URL to check for whitelist entries (this applies in addition to the above)</p>
+            <input type="checkbox" id="checkbox-external"/>
+            <input class="stretch" id="input-external"/> <button id="button-external-select" class="button button-alt">select</button>
+        </fieldset>
+
+        <fieldset>
+            <legend>Home Page</legend>
+            <p>Override home page while blocking</p>
+            <input type="checkbox" id="checkbox-homepage"/>
+            <input class="stretch" id="input-homepage"/> <button id="button-homepage-select" class="button button-alt">select</button>
+            <div><!--<label><input type="checkbox" id="checkbox-homepage-block"/>Use homepage instead of block page</label>--></div>
+        </fieldset>
+
+        <p><button class="button" id="button-save">Save Changes</button>
+        </p>
+    </div>
+    <script src="admin-ui.js"></script>
+  </body>
+</html>
