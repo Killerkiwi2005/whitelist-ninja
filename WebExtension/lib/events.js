@@ -1,6 +1,7 @@
 
 // https://developer.chrome.com/extensions/webRequest#type-RequestFilter
 var beforerequest = function(details) {
+        console.log("beforerequest called details: " + details);
 	
 	var url = details.url;
 	//details.url
@@ -109,7 +110,10 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     
 });
 
-
+if (typeof window === 'undefined') { // running in node.js
+    module.exports.beforerequest = beforerequest;
+} else { // running in browser
+}
 
 
 
