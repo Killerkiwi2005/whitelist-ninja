@@ -192,4 +192,36 @@ describe('WebExtension/lib/whitelist.js', function() {
 
         assert.isNotOk(whitelist.isAllowed('protocol://domain/some-url'));
     });
+
+    it('blocked url is not kept in history, if active tab is private', function() {
+        isActiveTabPrivate = sinon.spy(function(callback) { callback(true); });
+
+        whitelist.blocked('protocol://domain/some-url'); 
+
+        assert.isOk(storage.save.notCalled);
+    });
+
+    it('blocked url is kept in history', function() {
+        storage.data.history = [ 'url-1' ];
+        isActiveTabPrivate = sinon.spy(function(callback) { callback(false); });
+        util.stripUrlProtocol.withArgs('protocol://domain/some-url').returns('domain/some-url');
+        util.getDomain.withArgs('domain/some-url').returns('domain')
+
+        whitelist.blocked('protocol://domain/some-url'); 
+
+        assert.isOk(storage.save.called);
+        assert.deepEqual(storage.data.history, [ 'url-1', 'domain' ]);
+    });
+
+    it('blocked url domain replaces previous occurence in history', function() {
+        storage.data.history = [ 'domain', 'url-1' ];
+        isActiveTabPrivate = sinon.spy(function(callback) { callback(false); });
+        util.stripUrlProtocol.withArgs('protocol://domain/some-url').returns('domain/some-url');
+        util.getDomain.withArgs('domain/some-url').returns('domain')
+
+        whitelist.blocked('protocol://domain/some-url'); 
+
+        assert.isOk(storage.save.called);
+        assert.deepEqual(storage.data.history, [ 'url-1', 'domain' ]);
+    });
 });

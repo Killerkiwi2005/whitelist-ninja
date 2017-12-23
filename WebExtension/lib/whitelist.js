@@ -172,6 +172,7 @@ function blocked(location){
 			if(storage.data.history[i].toString() == domain.toString()){
 				storage.data.history.splice(i, 1);
 				storage.data.history.push(domain);
+				storage.save();
 				return;
 			}
 		}	
