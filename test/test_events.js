@@ -1,22 +1,18 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
 
-var chrome = require('sinon-chrome/extensions');
-var browser = require('sinon-chrome/webextensions');
-
 describe('WebExtension/lib/events.js', function() {
 
     before(function () {
-        global.chrome = chrome;
-        global.browser = browser;
+        chrome = require('sinon-chrome/extensions');
+        browser = require('sinon-chrome/webextensions');
 
-        global.whitelist = {
+        whitelist = {
             init: sinon.spy(),
             isAllowed: sinon.stub(),
             blocked: sinon.spy()
         };
-        global.expandUrl = sinon.stub();
-        expandUrl.returnsArg(0);
+        expandUrl = sinon.stub().returnsArg(0);
 
         events = require('../WebExtension/lib/events.js');
     });
@@ -33,39 +29,46 @@ describe('WebExtension/lib/events.js', function() {
     });
 
     it('should add onBeforeRequest listener on load', function() {
-        assert.ok(chrome.webRequest.onBeforeRequest.addListener.calledOnce);
+        assert.isOk(chrome.webRequest.onBeforeRequest.addListener.calledWith(events.beforerequest, {urls: ["<all_urls>"],  types: ["main_frame"]}, ['blocking']));
     });
 
     it('should redirect on blocked page when not in whitelist', function() {
         var result = events.beforerequest({url: 'some-url', tabId: 'some-tab'});
+
         assert.deepEqual(result, { redirectUrl: 'data/block-ui.html?some-url' });
-        assert.ok(whitelist.blocked.calledWith('some-url'));
+        assert.isOk(whitelist.blocked.calledWith('some-url'));
     });
     
     it('should not redirect on blocked page when isNotActive', function() {
         isActive = false;
+        
         var result = events.beforerequest({url: 'some-url', tabId: 'some-tab'});
+
         assert.deepEqual(result, { });
-        assert.isNotOk(whitelist.blocked.called);
+        assert.isOk(whitelist.blocked.notCalled);
     });
 
     it('should not redirect on blocked page when url is in whitelist', function() {
         whitelist.isAllowed.withArgs('some-url').returns(true);
+
         var result = events.beforerequest({url: 'some-url', tabId: 'some-tab'});
+
         assert.deepEqual(result, { });
-        assert.isNotOk(whitelist.blocked.called);
+        assert.isOk(whitelist.blocked.notCalled);
     });
 
     it('should not redirect panel ui page', function() {
         var result = events.beforerequest({url: 'data/panel-ui.html', tabId: 'some-tab'});
+
         assert.deepEqual(result, { });
-        assert.isNotOk(whitelist.blocked.called);
+        assert.isOk(whitelist.blocked.notCalled);
     });
 
     it('should not redirect block ui page', function() {
         var result = events.beforerequest({url: 'data/block-ui.html', tabId: 'some-tab'});
+
         assert.deepEqual(result, { });
-        assert.isNotOk(whitelist.blocked.called);
+        assert.isOk(whitelist.blocked.notCalled);
     });
 });
 
