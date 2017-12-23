@@ -75,7 +75,7 @@ describe('WebExtension/lib/whitelist.js', function() {
         storage.data.homepage = { active : false, url : null, original : null };
         util.readTextFromFile = sinon.spy(function(url, callback) {
             if (url === 'incorrect-json') {
-                callback('{ redirect_homepage: true, homepage_url: "homepage-url" }');
+                callback('{ : }');
             }
         });
 
@@ -87,24 +87,24 @@ describe('WebExtension/lib/whitelist.js', function() {
     });
 
     it('url is added to whitelist', function() {
-        storage.data.whitelist = [];
-        util.stripUrlProtocol.withArgs('protocol-domain-some-url').returns('domain-some-url');
+        storage.data.whitelist = [ 'url-1' ];
+        util.stripUrlProtocol.withArgs('protocol://domain/some-url').returns('domain/some-url');
 
-        whitelist.add('', 'protocol-domain-some-url');
+        whitelist.add('', 'protocol://domain/some-url');
 
         assert.isOk(storage.save.called);
-        assert.deepEqual(storage.data.whitelist, [ 'domain-some-url' ]);
+        assert.deepEqual(storage.data.whitelist, [ 'url-1', 'domain/some-url' ]);
     });
 
     it('wildcard url is added to whitelist when domain method is set', function() {
-        storage.data.whitelist = [];
-        util.stripUrlProtocol.withArgs('protocol-domain-some-url').returns('domain-some-url');
-        util.getDomain.withArgs('domain-some-url').returns('domain')
+        storage.data.whitelist = [ 'url-1' ];
+        util.stripUrlProtocol.withArgs('protocol://domain/some-url').returns('domain/some-url');
+        util.getDomain.withArgs('domain/some-url').returns('domain')
 
-        whitelist.add('domain', 'protocol-domain-some-url');
+        whitelist.add('domain', 'protocol://domain/some-url');
 
         assert.isOk(storage.save.called);
-        assert.deepEqual(storage.data.whitelist, [ 'domain*' ]);
+        assert.deepEqual(storage.data.whitelist, [ 'url-1', 'domain*' ]);
     });
 
     it('url is removed from whitelist', function() {
@@ -137,49 +137,59 @@ describe('WebExtension/lib/whitelist.js', function() {
     });
 
     it('url is allowed when it is in whitelist', function() {
-        storage.data.whitelist = [ 'url-1', 'domain-some-url', 'url-3' ];
-        util.stripUrlProtocol.withArgs('protocol-domain-some-url').returns('domain-some-url');
+        storage.data.whitelist = [ 'url-1', 'domain/some-url', 'url-3' ];
+        util.stripUrlProtocol.withArgs('protocol://domain/some-url').returns('domain/some-url');
 
-        assert.isOk(whitelist.isAllowed('protocol-domain-some-url'));
+        assert.isOk(whitelist.isAllowed('protocol://domain/some-url'));
     });
 
     it('url is allowed when domain is in whitelist', function() {
         storage.data.whitelist = [ 'url-1', 'domain*', 'url-3' ];
-        util.stripUrlProtocol.withArgs('protocol-domain-some-url').returns('domain-some-url');
-        util.stringStartsWith.withArgs('domain-some-url', 'domain').returns(true);
+        util.stripUrlProtocol.withArgs('protocol://domain/some-url').returns('domain/some-url');
+        util.stringStartsWith.withArgs('domain/some-url', 'domain').returns(true);
 
-        assert.isOk(whitelist.isAllowed('protocol-domain-some-url'));
+        assert.isOk(whitelist.isAllowed('protocol://domain/some-url'));
     });
 
     it('url is allowed when it starts with www plus domain from whitelist', function() {
         storage.data.whitelist = [ 'url-1', 'domain*', 'url-3' ];
-        util.stripUrlProtocol.withArgs('protocol-www.domain-some-url').returns('www.domain-some-url');
-        util.stringStartsWith.withArgs('www.domain-some-url', 'www.domain').returns(true);
+        util.stripUrlProtocol.withArgs('protocol://www.domain/some-url').returns('www.domain/some-url');
+        util.stringStartsWith.withArgs('www.domain/some-url', 'www.domain').returns(true);
 
-        assert.isOk(whitelist.isAllowed('protocol-www.domain-some-url'));
+        assert.isOk(whitelist.isAllowed('protocol://www.domain/some-url'));
     });
 
     it('url is allowed when it is in external whitelist', function() {
         storage.data.whitelist = [ ];
         storage.data.externalList = { active: true, url: 'external-list-json' };
-        util.stripUrlProtocol.withArgs('protocol-domain-some-url').returns('domain-some-url');
-        util.stringStartsWith.withArgs('domain-some-url', 'domain-some-url').returns(true);
+        util.stripUrlProtocol.withArgs('protocol://domain/some-url').returns('domain/some-url');
+        util.stringStartsWith.withArgs('domain/some-url', 'domain/some-url').returns(true);
         util.readTextFromFile = sinon.spy(function(url, callback) {
             if (url === 'external-list-json') {
-                callback('{ "whitelist": [ "url-1", "domain-some-url", "url-3" ] }');
+                callback('{ "whitelist": [ "url-1", "domain/some-url", "url-3" ] }');
             }
         });
 
-        assert.isOk(whitelist.isAllowed('protocol-domain-some-url'));
+        assert.isOk(whitelist.isAllowed('protocol://domain/some-url'));
     });
 
     it('url is allowed when it is a homepage', function() {
         storage.data.whitelist = [ ];
         storage.data.externalList = { active: false };
-        storage.data.homepage = { active : true, url : 'protocol-domain-some-url' };
-        util.stripUrlProtocol.withArgs('protocol-domain-some-url').returns('domain-some-url');
-        util.stringStartsWith.withArgs('domain-some-url', 'domain-some-url').returns(true);
+        storage.data.homepage = { active : true, url : 'protocol://domain/some-url' };
+        util.stripUrlProtocol.withArgs('protocol://domain/some-url').returns('domain/some-url');
+        util.stringStartsWith.withArgs('domain/some-url', 'domain/some-url').returns(true);
 
-        assert.isOk(whitelist.isAllowed('protocol-domain-some-url'));
+        assert.isOk(whitelist.isAllowed('protocol://domain/some-url'));
+    });
+
+    it('url is denied if it is not in whitelist', function() {
+        storage.data.whitelist = [ 'url-1' ];
+        storage.data.externalList = { active: false };
+        storage.data.homepage = { active : false };
+        util.stripUrlProtocol.withArgs('protocol://domain/some-url').returns('domain/some-url');
+        util.stringStartsWith.withArgs('domain/some-url', 'domain/some-url').returns(true);
+
+        assert.isNotOk(whitelist.isAllowed('protocol://domain/some-url'));
     });
 });
