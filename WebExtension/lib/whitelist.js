@@ -192,6 +192,7 @@ function getList(){
 
 function setList(list){
 	storage.data.whitelist = list;
+        storage.save();
 }
 
 function getHistory(){

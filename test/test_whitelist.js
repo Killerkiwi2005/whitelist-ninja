@@ -205,7 +205,7 @@ describe('WebExtension/lib/whitelist.js', function() {
         storage.data.history = [ 'url-1' ];
         isActiveTabPrivate = sinon.spy(function(callback) { callback(false); });
         util.stripUrlProtocol.withArgs('protocol://domain/some-url').returns('domain/some-url');
-        util.getDomain.withArgs('domain/some-url').returns('domain')
+        util.getDomain.withArgs('domain/some-url').returns('domain');
 
         whitelist.blocked('protocol://domain/some-url'); 
 
@@ -217,11 +217,78 @@ describe('WebExtension/lib/whitelist.js', function() {
         storage.data.history = [ 'domain', 'url-1' ];
         isActiveTabPrivate = sinon.spy(function(callback) { callback(false); });
         util.stripUrlProtocol.withArgs('protocol://domain/some-url').returns('domain/some-url');
-        util.getDomain.withArgs('domain/some-url').returns('domain')
+        util.getDomain.withArgs('domain/some-url').returns('domain');
 
         whitelist.blocked('protocol://domain/some-url'); 
 
         assert.isOk(storage.save.called);
         assert.deepEqual(storage.data.history, [ 'url-1', 'domain' ]);
+    });
+
+    it('21 last blocked urls are kept in history', function() {
+        var maxHistorySize = 21;
+        var lastDomain = 'domain-' + maxHistorySize;
+        storage.data.history = [];
+        for (var i = 0; i < maxHistorySize; ++i) {
+            storage.data.history.push('domain-' + i);
+        }
+        var expectedHistory = storage.data.history.slice();
+        expectedHistory.shift();
+        expectedHistory.push(lastDomain);
+        isActiveTabPrivate = sinon.spy(function(callback) { callback(false); });
+        util.stripUrlProtocol.withArgs('protocol://' + lastDomain + '/some-url').returns(lastDomain + '/some-url');
+        util.getDomain.withArgs(lastDomain + '/some-url').returns(lastDomain);
+
+        whitelist.blocked('protocol://' + lastDomain + '/some-url'); 
+
+        assert.isOk(storage.save.called);
+        assert.deepEqual(storage.data.history, expectedHistory);
+    });
+
+    it('setExternalList method reads external file if external list is active', function() {
+        storage.data.externalList = {};
+
+        whitelist.setExternalList(true, 'external-list-json');
+
+        assert.isOk(storage.save.called);
+        assert.isOk(util.readTextFromFile.calledWith('external-list-json'));
+        assert.deepEqual(storage.data.externalList, { active: true, url: 'external-list-json' });
+    });
+
+    it('setExternalList method doesn\'t read external file if external list is NOT active', function() {
+        storage.data.externalList = {};
+
+        whitelist.setExternalList(false, 'external-list-json');
+
+        assert.isOk(storage.save.called);
+        assert.isOk(util.readTextFromFile.notCalled);
+        assert.deepEqual(storage.data.externalList, { active: false, url: 'external-list-json' });
+    });
+
+    it('setList saves whitelist data', function() {
+        storage.data.whitelist = [];
+
+        whitelist.setList([ 'url' ]);
+        
+        assert.isOk(storage.save.called);
+        assert.deepEqual(storage.data.whitelist, [ 'url' ]);
+    });
+
+    it('setHomepage saves data', function() {
+        storage.data.homepage = {}; 
+
+        whitelist.setHomepage(true, 'url');
+        
+        assert.isOk(storage.save.called);
+        assert.deepEqual(storage.data.homepage, { active: true, url: 'url' });
+    });
+
+    it('setOriginalHomepage saves data', function() {
+        storage.data.homepage = {}; 
+
+        whitelist.setOriginalHomepage('url');
+        
+        assert.isOk(storage.save.called);
+        assert.deepEqual(storage.data.homepage, { original: 'url' });
     });
 });
