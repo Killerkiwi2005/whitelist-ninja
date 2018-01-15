@@ -49,6 +49,7 @@ function remove(url){
 	for(var i = storage.data.whitelist.length-1; i>=0;i--){
 		if (storage.data.whitelist[i] == url){
 			 storage.data.whitelist.splice(i, 1);
+			 storage.save();
 		}
 	}
 }
@@ -87,10 +88,10 @@ function contains(url){
 				if ( whitelistitem.charAt(whitelistitem.length - 1) != "*" && url === whitelistitem) {
 					// Exact match
 					return true;
-				} else if ( util.stringStartsWith(url, whitelistitem.substring(0, whitelistitem.length - 2)) ) {
+				} else if ( util.stringStartsWith(url, whitelistitem.substring(0, whitelistitem.length - 1)) ) {
 					// url starts with 
 					return true;
-				} else if ( util.stringStartsWith(url, "www." + whitelistitem.substring(0, whitelistitem.length - 2)) ) {
+				} else if ( util.stringStartsWith(url, "www." + whitelistitem.substring(0, whitelistitem.length - 1)) ) {
 					// url starts with 
 					return true;
 				}
@@ -116,7 +117,7 @@ function contains(url){
 	if(storage.data.homepage && storage.data.homepage.active && storage.data.homepage.url)
 	{
 		console.log("Check custom homepage");
-		if(json && json.whitelist && checkList([util.stripUrlProtocol(storage.homepage.url)])){
+		if(checkList([util.stripUrlProtocol(storage.data.homepage.url)])){
 			return true;
 		}
 	}
@@ -171,6 +172,7 @@ function blocked(location){
 			if(storage.data.history[i].toString() == domain.toString()){
 				storage.data.history.splice(i, 1);
 				storage.data.history.push(domain);
+				storage.save();
 				return;
 			}
 		}	
@@ -190,6 +192,7 @@ function getList(){
 
 function setList(list){
 	storage.data.whitelist = list;
+        storage.save();
 }
 
 function getHistory(){
@@ -225,23 +228,31 @@ function setOriginalHomepage(url){
 	storage.save();
 }
 
-(function(){
-	if(typeof(window.exports) == 'undefined'){
-		var exports = {};
-		window.whitelist = exports;
-	}
-	exports.init = init;
-	exports.add = add;
-	exports.remove = remove;
-	exports.isAllowed = isAllowed;
-	exports.contains = contains;
-	exports.blocked = blocked;
-	exports.getList = getList;
-	exports.setList = setList;
-	exports.getHistory = getHistory;
-	exports.getExternalList = getExternalList;
-	exports.setExternalList = setExternalList;
-	exports.getHomepage = getHomepage;
-	exports.setHomepage = setHomepage;
-	exports.setOriginalHomepage = setOriginalHomepage;
-})();
+function exportWhitelist(exports) {
+    exports.init = init;
+    exports.add = add;
+    exports.remove = remove;
+    exports.isAllowed = isAllowed;
+    exports.contains = contains;
+    exports.blocked = blocked;
+    exports.getList = getList;
+    exports.setList = setList;
+    exports.getHistory = getHistory;
+    exports.getExternalList = getExternalList;
+    exports.setExternalList = setExternalList;
+    exports.getHomepage = getHomepage;
+    exports.setHomepage = setHomepage;
+    exports.setOriginalHomepage = setOriginalHomepage;
+}
+
+if (typeof window === 'undefined') { // running in node.js
+    exportWhitelist(exports);
+} else { // running in browser
+    (function(){
+        if(typeof(window.exports) == 'undefined'){
+            var exports = {};
+            window.whitelist = exports;
+        }
+        exportWhitelist(exports);
+    })();
+}
