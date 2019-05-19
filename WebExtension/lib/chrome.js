@@ -26,6 +26,7 @@ function storageWrapper(name){
 	}
 	
 	self.init();
+	return self
 }
 
 function expandUrl(url){
@@ -39,4 +40,9 @@ function isActiveTabPrivate(cb){
 	//	return;
 
 	return  chrome.tabs.query({active: true, lastFocusedWindow: true }, function(tabs){ cb(tabs[0].incognito)}) 
+}
+
+if (typeof window === 'undefined') { // running in node.js
+    module.exports.storageWrapper = storageWrapper;
+} else { // running in browser
 }
