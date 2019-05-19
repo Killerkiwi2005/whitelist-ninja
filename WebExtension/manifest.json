@@ -26,7 +26,9 @@
    ],
    
    "background": {
-    "scripts": ["lib/browser-polyfill.js", "lib/storage.js", "lib/util.js", "lib/chrome.js", "lib/whitelist.js", "lib/security.js", "worker.js", "lib/events.js"],
+    "scripts": ["lib/browser-polyfill.js", "lib/storage.js", "lib/util.js",
+    	"lib/chrome.js", "lib/whitelist.js", "lib/security.js", "worker.js",
+    	"lib/events.js"],
     "persistent": true // CHROME ONLY
   }   
 }

@@ -1,7 +1,7 @@
 
 // https://developer.chrome.com/extensions/webRequest#type-RequestFilter
 var beforerequest = function(details) {
-        console.log("beforerequest called details: " + JSON.stringify(details));
+	console.log("beforerequest called details: " + JSON.stringify(details));
 	
 	var url = details.url;
 	//details.url
