@@ -7,16 +7,14 @@ describe('storageWrapper test', function() {
         chrome = require('sinon-chrome/extensions');
         browser = require('sinon-chrome/webextensions');
 
-        localStorage = {};
-
         chrome_module = require('../WebExtension/lib/chrome.js');
     });
 
     beforeEach(function() {
+        localStorage = {};
     });
 
     after(function() {
-        localStorage = {};
     });
 
     it('storage calls callback', function() {
@@ -45,6 +43,15 @@ describe('storageWrapper test', function() {
 		actual = storage.get("test-key");
 
     	assert.equal(actual, "test-value");
+    });
+
+    it('set writes to the local storage', function() {
+    	var storage = chrome_module.storageWrapper("test storage");
+
+    	storage.set("test-key", "test-value");
+
+		var data = JSON.parse(localStorage["test storage"]);
+    	assert.equal(data["test-key"], "test-value");
     });
 
 });
