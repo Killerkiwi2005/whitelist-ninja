@@ -19,7 +19,7 @@ describe('storageWrapper test', function() {
         localStorage = {};
     });
 
-    it('storage should call callback', function() {
+    it('storage calls callback', function() {
     	var callback = sinon.spy();
     	var storage = chrome_module.storageWrapper("test storage");
 
