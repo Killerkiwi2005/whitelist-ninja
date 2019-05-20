@@ -38,5 +38,14 @@ describe('storageWrapper test', function() {
     	storage.init(callback);
     });
 
+    it('get returns data from local storage', function() {
+        localStorage["test storage"] = '{ "test-key": "test-value" }';
+    	var storage = chrome_module.storageWrapper("test storage");
+
+		actual = storage.get("test-key");
+
+    	assert.equal(actual, "test-value");
+    });
+
 });
 
