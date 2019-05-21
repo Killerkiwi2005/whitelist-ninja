@@ -8,24 +8,25 @@ function storageWrapper(name){
 
 	self.init = function(cb){
 		var s = localStorage[storageName];
-		data = s ? JSON.parse(s) : {};
+		self.data = s ? JSON.parse(s) : {};
 		if(cb) cb();
 	};
 
 	self.set = function(key, value){
-		data[key] = value;
+		self.data[key] = value;
 		self.save();
 	}
 	
 	self.get = function(key){
-		return data[key];
+		return self.data[key];
 	}
 
 	self.save = function(){
-		localStorage[storageName] = JSON.stringify(data);
+		localStorage[storageName] = JSON.stringify(self.data);
 	}
 	
 	self.init();
+	return self
 }
 
 function expandUrl(url){
@@ -39,4 +40,9 @@ function isActiveTabPrivate(cb){
 	//	return;
 
 	return  chrome.tabs.query({active: true, lastFocusedWindow: true }, function(tabs){ cb(tabs[0].incognito)}) 
+}
+
+if (typeof window === 'undefined') { // running in node.js
+    module.exports.storageWrapper = storageWrapper;
+} else { // running in browser
 }
