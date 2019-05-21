@@ -54,5 +54,15 @@ describe('storageWrapper test', function() {
     	assert.equal(data["test-key"], "test-value");
     });
 
+    it('save writes data to the local storage', function() {
+    	var storage = chrome_module.storageWrapper("test storage");
+    	storage.data = { "test-key": "test-value" };
+
+    	storage.save();
+
+		var data = JSON.parse(localStorage["test storage"]);
+    	assert.equal(data["test-key"], "test-value");
+    });
+
 });
 
