@@ -64,5 +64,14 @@ describe('storageWrapper test', function() {
     	assert.equal(data["test-key"], "test-value");
     });
 
+    it('get returns what set writes', function() {
+    	var storage = chrome_module.storageWrapper("test storage");
+    	storage.set("test-key", "test-value");
+
+    	actual = storage.get("test-key");
+
+    	assert.equal(actual, "test-value");
+    });
+
 });
 
